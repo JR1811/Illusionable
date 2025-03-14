@@ -50,12 +50,12 @@ Obfuscation is a new status effect that scrambles an entity's name tag. When app
 
 <div style="text-align: center;">
 <br>
-<a href="https://modfest.net/bc25"><img
+<a href="https://fabricmc.net/"><img
     src="https://github.com/JR1811/Boatism/blob/1.21.1/external/promo/fabric_supported.png?raw=true"
     alt="Supported on Fabric"
     width="200"
 ></a>
-<a href="https://fabricmc.net/">
+<a href="https://modfest.net/bc25">
 <img src="https://raw.githubusercontent.com/worldwidepixel/badges/642d312b71811b9d2696b562f735b07288844c71/bc25/made_for/cozy.svg"
     alt="ClanketCon25"
     width="200"
