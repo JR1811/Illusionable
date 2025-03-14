@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "net.shirojr.illusionable.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "EntityMixin",
+    "EntityTrackerEntryMixin",
+    "LivingEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "client.EntityRenderDispatcherMixin",
+    "client.EntityRendererMixin",
+    "client.LivingEntityRendererMixin",
+    "client.PlayerListHudMixin"
+  ]
+}
