@@ -32,6 +32,10 @@ public class PlayerListHudMixin {
             original.call(context, texture, x, y, size, hatVisible, upsideDown);
             return;
         }
+        if (client.player.hasPermissionLevel(2) && client.getEntityRenderDispatcher().shouldRenderHitboxes()) {
+            original.call(context, texture, x, y, size, hatVisible, upsideDown);
+            return;
+        }
         Optional<Boolean> isObfuscated = Optional.ofNullable(IllusionableClient.OBFUSCATED_CACHE.get(playerProfile.getId()));
         if (isObfuscated.isEmpty() || !isObfuscated.get()) {
             original.call(context, texture, x, y, size, hatVisible, upsideDown);
@@ -44,6 +48,9 @@ public class PlayerListHudMixin {
     private Text renderObfuscatedName(PlayerListHud instance, PlayerListEntry entry, Operation<Text> original) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.player.isSpectator()) {
+            return original.call(instance, entry);
+        }
+        if (client.player.hasPermissionLevel(2) && client.getEntityRenderDispatcher().shouldRenderHitboxes()) {
             return original.call(instance, entry);
         }
         Optional<Boolean> isObfuscated = Optional.ofNullable(IllusionableClient.OBFUSCATED_CACHE.get(entry.getProfile().getId()));
