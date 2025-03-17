@@ -11,7 +11,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Uuids;
 import net.shirojr.illusionable.Illusionable;
 import net.shirojr.illusionable.IllusionableClient;
-import net.shirojr.illusionable.init.IllusionableStatusEffects;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -30,6 +29,7 @@ public record ObfuscatedCacheInitPacket(HashMap<UUID, Boolean> obfuscatedEntityL
     }
 
     public void sendPacket(ServerPlayerEntity player) {
+        if (player.networkHandler == null) return;
         ServerPlayNetworking.send(player, this);
     }
 

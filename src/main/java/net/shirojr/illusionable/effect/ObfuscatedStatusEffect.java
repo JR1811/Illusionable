@@ -1,9 +1,7 @@
 package net.shirojr.illusionable.effect;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.shirojr.illusionable.network.packet.ObfuscatedCacheUpdatePacket;

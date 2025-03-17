@@ -10,6 +10,7 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.shirojr.illusionable.Illusionable;
 import net.shirojr.illusionable.IllusionableClient;
+import net.shirojr.illusionable.util.wrapper.IllusionHandler;
 
 import java.util.Collection;
 
@@ -30,6 +31,7 @@ public record IllusionsCacheUpdatePacket(int entityNetworkId, boolean isTarget,
     }
 
     public void sendPacket(ServerPlayerEntity player) {
+        if (player.networkHandler == null) return;
         ServerPlayNetworking.send(player, this);
     }
 
@@ -39,8 +41,9 @@ public record IllusionsCacheUpdatePacket(int entityNetworkId, boolean isTarget,
 
     public void handlePacket(ClientPlayNetworking.Context context) {
         ClientWorld world = context.player().clientWorld;
-        if (world == null) return;
-        if (isValidIllusion() && isTarget()) {
+        if (world == null || !(world.getEntityById(entityNetworkId) instanceof IllusionHandler illusionable)) return;
+        illusionable.illusionable$setIllusion(isValidIllusion);
+        if (isTarget) {
             IllusionableClient.ILLUSIONS_CACHE.add(world.getEntityById(entityNetworkId()));
         } else {
             IllusionableClient.ILLUSIONS_CACHE.remove(world.getEntityById(entityNetworkId()));

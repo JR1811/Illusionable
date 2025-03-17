@@ -5,14 +5,12 @@ import net.minecraft.entity.Attackable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import net.shirojr.illusionable.init.IllusionableTrackedData;
@@ -26,10 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Mixin(LivingEntity.class)
@@ -39,18 +34,13 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
     }
 
     @Unique
-    private final List<UUID> illusionTargetsPersistence = new ArrayList<>();
+    private final HashSet<UUID> illusionTargetsPersistence = new HashSet<>();
 
     @Unique
-    private static final TrackedData<List<Integer>> ILLUSION_TARGETS_RUNTIME = DataTracker.registerData(LivingEntityMixin.class, IllusionableTrackedData.ENTITY_LIST);
-    @Unique
-    private static final TrackedData<Boolean> IS_ILLUSION = DataTracker.registerData(LivingEntityMixin.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private final HashSet<Integer> illusionTargetsRuntime = new HashSet<>();
 
-    @Inject(method = "initDataTracker", at = @At("TAIL"))
-    private void initCustomDataTracker(DataTracker.Builder builder, CallbackInfo ci) {
-        builder.add(ILLUSION_TARGETS_RUNTIME, new ArrayList<>());
-        builder.add(IS_ILLUSION, false);
-    }
+    @Unique
+    private boolean isIllusion = false;
 
     @Inject(method = "canTarget(Lnet/minecraft/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
     private void avoidTargetingIllusions(LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
@@ -75,39 +65,37 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
     }
 
     @Override
-    public List<UUID> illusionable$getPersistentIllusionTargets() {
-        return Collections.unmodifiableList(this.illusionTargetsPersistence);
+    public HashSet<UUID> illusionable$getPersistentIllusionTargets() {
+        return new HashSet<>(this.illusionTargetsPersistence);
     }
 
     @Override
-    public List<Entity> illusionable$getIllusionTargets() {
-        return IllusionableTrackedData.resolveEntityIds(getWorld(), dataTracker.get(ILLUSION_TARGETS_RUNTIME));
+    public HashSet<Entity> illusionable$getIllusionTargets() {
+        return IllusionableTrackedData.resolveEntityIds(getWorld(), this.illusionTargetsRuntime);
     }
 
     @Override
-    public void illusionable$modifyIllusionTargets(Consumer<List<UUID>> newList, boolean sendClientUpdate) {
+    public void illusionable$modifyIllusionTargets(Consumer<HashSet<UUID>> newList, boolean sendClientUpdate) {
         newList.accept(this.illusionTargetsPersistence);
-        if (sendClientUpdate && getWorld() instanceof ServerWorld serverWorld) {
-            this.illusionable$updateTrackedEntityIds(serverWorld);
-        }
+        if (!sendClientUpdate || !(getWorld() instanceof ServerWorld serverWorld)) return;
+        this.illusionable$updateTrackedEntityIds(serverWorld);
     }
 
     @Override
     public void illusionable$clearIllusionTargets() {
         this.illusionTargetsPersistence.clear();
-        if (getWorld() instanceof ServerWorld serverWorld) {
-            this.illusionable$updateTrackedEntityIds(serverWorld);
-        }
+        if (!(getWorld() instanceof ServerWorld serverWorld)) return;
+        this.illusionable$updateTrackedEntityIds(serverWorld);
     }
 
     @Override
     public boolean illusionable$isIllusion() {
-        return dataTracker.get(IS_ILLUSION);
+        return this.isIllusion;
     }
 
     @Override
     public void illusionable$setIllusion(boolean isIllusion) {
-        dataTracker.set(IS_ILLUSION, isIllusion);
+        this.isIllusion = isIllusion;
         this.illusionable$updateClients();
     }
 
@@ -136,7 +124,9 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
     @Override
     public void illusionable$updateClients() {
         if (this.getWorld().isClient()) return;
-        PlayerLookup.tracking(this).forEach(player -> {
+        List<ServerPlayerEntity> targets = new ArrayList<>(PlayerLookup.tracking(this));
+        if ((LivingEntity) (Object) this instanceof ServerPlayerEntity self) targets.add(self);
+        targets.forEach(player -> {
             boolean isTarget = this.illusionable$getIllusionTargets().contains(player);
             boolean isValidIllusion = this.illusionable$isIllusion();
             new IllusionsCacheUpdatePacket(this.getId(), isTarget, isValidIllusion).sendPacket(player);
@@ -152,7 +142,8 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
                 entityIds.add(entity.getId());
             }
         }
-        this.dataTracker.set(ILLUSION_TARGETS_RUNTIME, entityIds);
+        this.illusionTargetsRuntime.clear();
+        this.illusionTargetsRuntime.addAll(entityIds);
         this.illusionable$updateClients();
     }
 }

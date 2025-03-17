@@ -3,7 +3,7 @@ package net.shirojr.illusionable.util.wrapper;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerWorld;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -12,13 +12,13 @@ public interface IllusionHandler {
 
     void illusionable$setIllusion(boolean isIllusion);
 
-    List<UUID> illusionable$getPersistentIllusionTargets();
+    HashSet<UUID> illusionable$getPersistentIllusionTargets();
 
-    List<Entity> illusionable$getIllusionTargets();
+    HashSet<Entity> illusionable$getIllusionTargets();
 
-    void illusionable$modifyIllusionTargets(Consumer<List<UUID>> newList, boolean sendClientUpdate);
+    void illusionable$modifyIllusionTargets(Consumer<HashSet<UUID>> newList, boolean sendClientUpdate);
 
-    default void illusionable$modifyIllusionTargets(Consumer<List<UUID>> newList) {
+    default void illusionable$modifyIllusionTargets(Consumer<HashSet<UUID>> newList) {
         illusionable$modifyIllusionTargets(newList, true);
     }
 
