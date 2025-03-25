@@ -14,9 +14,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import net.shirojr.illusionable.init.IllusionableTrackedData;
-import net.shirojr.illusionable.network.packet.ObfuscatedCacheUpdatePacket;
 import net.shirojr.illusionable.network.packet.IllusionsCacheUpdatePacket;
+import net.shirojr.illusionable.network.packet.ObfuscatedCacheUpdatePacket;
 import net.shirojr.illusionable.util.wrapper.IllusionHandler;
+import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,9 +25,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
+@Debug(export = true)
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements Attackable, IllusionHandler {
     public LivingEntityMixin(EntityType<?> type, World world) {
@@ -64,6 +69,28 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
         new ObfuscatedCacheUpdatePacket(this.getUuid(), false).sendPacket(PlayerLookup.all(this.getServer()));
     }
 
+    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
+    private void readCustomDataNbt(NbtCompound nbt, CallbackInfo ci) {
+        this.illusionable$modifyIllusionTargets(uuids -> {
+            uuids.clear();
+            NbtList nbtList = nbt.getList("IllusionTargets", NbtElement.STRING_TYPE);
+            for (int i = 0; i < nbtList.size(); i++) {
+                uuids.add(UUID.fromString(nbtList.getString(i)));
+            }
+        }, false);
+        this.illusionable$setIllusion(nbt.getBoolean("IsIllusion"));
+    }
+
+    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
+    private void writeCustomDataNbt(NbtCompound nbt, CallbackInfo ci) {
+        NbtList nbtList = new NbtList();
+        for (UUID entry : illusionable$getPersistentIllusionTargets()) {
+            nbtList.add(NbtString.of(entry.toString()));
+        }
+        nbt.put("IllusionTargets", nbtList);
+        nbt.putBoolean("IsIllusion", illusionable$isIllusion());
+    }
+
     @Override
     public HashSet<UUID> illusionable$getPersistentIllusionTargets() {
         return new HashSet<>(this.illusionTargetsPersistence);
@@ -97,28 +124,6 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
     public void illusionable$setIllusion(boolean isIllusion) {
         this.isIllusion = isIllusion;
         this.illusionable$updateClients();
-    }
-
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    private void readCustomDataNbt(NbtCompound nbt, CallbackInfo ci) {
-        this.illusionable$modifyIllusionTargets(uuids -> {
-            uuids.clear();
-            NbtList nbtList = nbt.getList("IllusionTargets", NbtElement.STRING_TYPE);
-            for (int i = 0; i < nbtList.size(); i++) {
-                uuids.add(UUID.fromString(nbtList.getString(i)));
-            }
-        }, false);
-        this.illusionable$setIllusion(nbt.getBoolean("IsIllusion"));
-    }
-
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    private void writeCustomDataNbt(NbtCompound nbt, CallbackInfo ci) {
-        NbtList nbtList = new NbtList();
-        for (UUID entry : illusionable$getPersistentIllusionTargets()) {
-            nbtList.add(NbtString.of(entry.toString()));
-        }
-        nbt.put("IllusionTargets", nbtList);
-        nbt.putBoolean("IsIllusion", illusionable$isIllusion());
     }
 
     @Override
