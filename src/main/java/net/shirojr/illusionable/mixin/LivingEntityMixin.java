@@ -1,5 +1,7 @@
 package net.shirojr.illusionable.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Attackable;
 import net.minecraft.entity.Entity;
@@ -19,6 +21,7 @@ import net.shirojr.illusionable.network.packet.ObfuscatedCacheUpdatePacket;
 import net.shirojr.illusionable.util.wrapper.IllusionHandler;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,6 +37,12 @@ import java.util.function.Consumer;
 @Debug(export = true)
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements Attackable, IllusionHandler {
+    @Shadow
+    protected abstract void clearPotionSwirls();
+
+    @Shadow
+    protected abstract void updatePotionSwirls();
+
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
@@ -67,6 +76,15 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
     private void cleanUpObfuscation(StatusEffectInstance effect, CallbackInfo ci) {
         if (this.getWorld().isClient() || this.getServer() == null) return;
         new ObfuscatedCacheUpdatePacket(this.getUuid(), false).sendPacket(PlayerLookup.all(this.getServer()));
+    }
+
+    @WrapOperation(method = "updatePotionVisibility", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;updatePotionSwirls()V"))
+    private void disablePotionSwirlsForIllusions(LivingEntity instance, Operation<Void> original) {
+        if (!(instance instanceof IllusionHandler illusionable) || !illusionable.illusionable$isIllusion()) {
+            original.call(instance);
+            return;
+        }
+        clearPotionSwirls();
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
@@ -124,6 +142,13 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
     public void illusionable$setIllusion(boolean isIllusion) {
         this.isIllusion = isIllusion;
         this.illusionable$updateClients();
+        if (!getWorld().isClient()) {
+            if (this.isIllusion) {
+                clearPotionSwirls();
+            } else {
+                updatePotionSwirls();
+            }
+        }
     }
 
     @Override
