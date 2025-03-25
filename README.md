@@ -15,13 +15,10 @@ Illusions are entities that are normally imperceptible to others. However, entit
 
 Entities that cannot perceive an illusion will not experience the following:
 
-
 - Rendering of the illusion entity
-- Visibility of fire on a burning illusion entity
-- Display of the illusion entity's shadow
 - Debug hitbox (F3 + B) visibility (restricted for server admins)
 - Step sounds of the illusion entity
-- Selection of the illusion entity as a target by AI-driven entities
+- Selection of the illusion entity as a target by AI-driven entities (e.g. zombies won't chase players which are listed as illusions)
 
 If the [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) mod is installed, only the designated targets will be able to hear an illusion entity speaking.
 
@@ -35,12 +32,11 @@ If the [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) mod is
 
 Multiple entities (including non-player entities like Zombies) can be specified as illusions and targets. Illusion entities will only be visible and interactable to their assigned targets, while remaining hidden from all others.
 
-
 To set up an Illusion Entity, use the `/illusion set <illusionEntity>` command. Setting the Illusion state to `false` will also remove all target entries automatically.
 To add and remove Illusion targets to your Illusion Entity, use the `/illusion add <illusionEntity> <targetEntity>` and `/illusion remove <illusionEntity> <targetEntity>` commands.
-Omitting the `targetEntity` from the remove command will remove all targets from an `illusionEntity`. Those specified entities in the command can also be multiple and even non-player entities, like Zombies.
+Omitting the `targetEntity` from the remove command will remove all targets from an `illusionEntity`. any specified entities in the commands can also be multiple and even non-player entities, like Zombies. So, for example, you can turn a horde of mobs into illusions or illusion targets.
 
-Illusion entities will only target their specified targets and Entities which can't perceive the illusion entity won't target them either.
+Illusion entities will only target their specified illusion targets, and Entities which can't perceive the illusion entity (are not listed as illusion targets) won't target them either.
 
 ### Obfuscation Details
 Obfuscation is a new status effect that scrambles an entity's name tag. When applied to a player, it also:
@@ -51,17 +47,17 @@ Obfuscation is a new status effect that scrambles an entity's name tag. When app
 <div style="text-align: center;">
 <br>
 <a href="https://fabricmc.net/"><img
-    src="https://github.com/JR1811/Boatism/blob/1.21.1/external/promo/fabric_supported.png?raw=true"
+    src="https://raw.githubusercontent.com/fabricated-atelier/.github/a021bde84febcb68adc69fc7ae60114e8c0902db/assets/badges/bc25/supported_on_fabric_loader.svg"
     alt="Supported on Fabric"
     width="200"
 ></a>
 <a href="https://modfest.net/bc25">
-<img src="https://raw.githubusercontent.com/worldwidepixel/badges/642d312b71811b9d2696b562f735b07288844c71/bc25/made_for/cozy.svg"
-    alt="ClanketCon25"
+<img src="https://raw.githubusercontent.com/fabricated-atelier/.github/f026478715176aeb6a334f1c21765031d9b6c3f9/assets/badges/bc25/created_for_bc25.svg"
+    alt="BlanketCon25"
     width="200"
 /></a>
 <a href="https://github.com/JR1811/Illusionable/issues"><img
-    src="https://github.com/JR1811/Boatism/blob/1.21.1/external/promo/badges/work_in_progress.png?raw=true"
+    src="https://raw.githubusercontent.com/fabricated-atelier/.github/f026478715176aeb6a334f1c21765031d9b6c3f9/assets/badges/bc25/work_in_progress.svg"
     alt="Work in Progress"
     width="200"
 ></a>
