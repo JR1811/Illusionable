@@ -1,3 +1,5 @@
 {
-  "itemgroup.illusionable.illusionable": "Illusionable"
+  "itemgroup.illusionable.illusionable": "Illusionable",
+  "item.illusionable.illusion_debug": "Illusion Debug",
+  "item.illusionable.obfuscated_debug": "Obfuscated Debug"
 }
