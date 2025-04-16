@@ -19,8 +19,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Optional;
-
 @Mixin(EntityRenderer.class)
 public class EntityRendererMixin {
     @Shadow
@@ -35,7 +33,7 @@ public class EntityRendererMixin {
         if (client == null || client.player == null) {
             return original.call(instance, text, x, y, color, shadow, matrix, vertexConsumers, layerType, backgroundColor, light);
         }
-        boolean isObfuscated = Optional.ofNullable(IllusionableClient.OBFUSCATED_CACHE.get(entity.getUuid())).orElse(false);
+        boolean isObfuscated = IllusionableClient.OBFUSCATED_CACHE.contains(entity.getUuid());
         MutableText newText = text.copy();
         if (isObfuscated) {
             if (!client.player.hasPermissionLevel(2) || !dispatcher.shouldRenderHitboxes()) {

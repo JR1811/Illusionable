@@ -47,7 +47,12 @@ public record ObfuscatedCacheUpdatePacket(HashMap<UUID, Boolean> obfuscatedEntit
     public void handlePacket(ClientPlayNetworking.Context context) {
         ClientPlayerEntity player = context.player();
         if (player == null) return;
-        IllusionableClient.OBFUSCATED_CACHE.putAll(obfuscatedEntityList);
-        // IllusionableClient.OBFUSCATED_CACHE.put(player.getUuid(), player.hasStatusEffect(IllusionableStatusEffects.OBFUSCATED));
+        obfuscatedEntityList().forEach((uuid, isObfuscated) -> {
+            if (isObfuscated) {
+                IllusionableClient.OBFUSCATED_CACHE.add(uuid);
+            } else {
+                IllusionableClient.OBFUSCATED_CACHE.remove(uuid);
+            }
+        });
     }
 }

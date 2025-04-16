@@ -12,10 +12,7 @@ import net.shirojr.illusionable.network.packet.ObfuscatedCacheInitPacket;
 import net.shirojr.illusionable.network.packet.ObfuscatedCacheUpdatePacket;
 import net.shirojr.illusionable.util.wrapper.IllusionHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class ServerConnectionEvents {
@@ -46,9 +43,10 @@ public class ServerConnectionEvents {
                 handler.getPlayer().hasStatusEffect(IllusionableStatusEffects.OBFUSCATED)
         ).sendPacket(players);
 
-        HashMap<UUID, Boolean> obfuscatedEntities = new HashMap<>();
+        HashSet<UUID> obfuscatedEntities = new HashSet<>();
         for (ServerPlayerEntity entry : PlayerLookup.all(server)) {
-            obfuscatedEntities.put(entry.getUuid(), entry.hasStatusEffect(IllusionableStatusEffects.OBFUSCATED));
+            if (!entry.hasStatusEffect(IllusionableStatusEffects.OBFUSCATED)) continue;
+            obfuscatedEntities.add(entry.getUuid());
         }
         new ObfuscatedCacheInitPacket(obfuscatedEntities).sendPacket(handler.getPlayer());
     }

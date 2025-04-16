@@ -3,18 +3,24 @@ package net.shirojr.illusionable.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Attackable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.shirojr.illusionable.init.IllusionableStatusEffects;
 import net.shirojr.illusionable.init.IllusionableTrackedData;
 import net.shirojr.illusionable.network.packet.IllusionsCacheUpdatePacket;
 import net.shirojr.illusionable.network.packet.ObfuscatedCacheUpdatePacket;
@@ -28,10 +34,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Debug(export = true)
@@ -42,6 +45,12 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
 
     @Shadow
     protected abstract void updatePotionSwirls();
+
+    @Shadow
+    protected abstract void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition);
+
+    @Shadow
+    public abstract Map<RegistryEntry<StatusEffect>, StatusEffectInstance> getActiveStatusEffects();
 
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
@@ -74,8 +83,12 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
 
     @Inject(method = "onStatusEffectRemoved", at = @At("TAIL"))
     private void cleanUpObfuscation(StatusEffectInstance effect, CallbackInfo ci) {
-        if (this.getWorld().isClient() || this.getServer() == null) return;
-        new ObfuscatedCacheUpdatePacket(this.getUuid(), false).sendPacket(PlayerLookup.all(this.getServer()));
+        syncObfuscation(false);
+    }
+
+    @Inject(method = "onDeath", at = @At("TAIL"))
+    private void OnDeathObfuscatedSync(DamageSource damageSource, CallbackInfo ci) {
+        syncObfuscation(this.getActiveStatusEffects().containsKey(IllusionableStatusEffects.OBFUSCATED));
     }
 
     @WrapOperation(method = "updatePotionVisibility", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;updatePotionSwirls()V"))
@@ -108,6 +121,14 @@ public abstract class LivingEntityMixin extends Entity implements Attackable, Il
         nbt.put("IllusionTargets", nbtList);
         nbt.putBoolean("IsIllusion", illusionable$isIllusion());
     }
+
+
+    @Unique
+    private void syncObfuscation(boolean isObfuscated) {
+        if (this.getWorld().isClient() || this.getServer() == null) return;
+        new ObfuscatedCacheUpdatePacket(this.getUuid(), isObfuscated).sendPacket(PlayerLookup.all(this.getServer()));
+    }
+
 
     @Override
     public HashSet<UUID> illusionable$getPersistentIllusionTargets() {

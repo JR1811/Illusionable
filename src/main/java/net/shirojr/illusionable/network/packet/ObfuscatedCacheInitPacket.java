@@ -12,14 +12,14 @@ import net.minecraft.util.Uuids;
 import net.shirojr.illusionable.Illusionable;
 import net.shirojr.illusionable.IllusionableClient;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
-public record ObfuscatedCacheInitPacket(HashMap<UUID, Boolean> obfuscatedEntityList) implements CustomPayload {
+public record ObfuscatedCacheInitPacket(HashSet<UUID> obfuscatedEntityList) implements CustomPayload {
     public static final Id<ObfuscatedCacheInitPacket> IDENTIFIER = new Id<>(Illusionable.getId("obfuscated_entity_cache_init"));
 
     public static final PacketCodec<RegistryByteBuf, ObfuscatedCacheInitPacket> CODEC = PacketCodec.tuple(
-            PacketCodecs.map(HashMap::new, Uuids.PACKET_CODEC, PacketCodecs.BOOL), ObfuscatedCacheInitPacket::obfuscatedEntityList,
+            Uuids.PACKET_CODEC.collect(PacketCodecs.toCollection(HashSet::new)), ObfuscatedCacheInitPacket::obfuscatedEntityList,
             ObfuscatedCacheInitPacket::new
     );
 
@@ -36,7 +36,7 @@ public record ObfuscatedCacheInitPacket(HashMap<UUID, Boolean> obfuscatedEntityL
     public void handlePacket(ClientPlayNetworking.Context context) {
         ClientPlayerEntity player = context.player();
         if (player == null) return;
-        IllusionableClient.OBFUSCATED_CACHE.putAll(obfuscatedEntityList);
+        IllusionableClient.OBFUSCATED_CACHE.addAll(obfuscatedEntityList);
         // IllusionableClient.OBFUSCATED_CACHE.put(player.getUuid(), player.hasStatusEffect(IllusionableStatusEffects.OBFUSCATED));
     }
 }

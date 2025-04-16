@@ -28,7 +28,7 @@ public class MessageHandlerMixin {
     private MessageType.Parameters obfuscatePlayerName(MessageType.Parameters params, @Local(argsOnly = true) GameProfile sender) {
         if (client == null || client.player == null) return params;
         var obfuscatedCache = IllusionableClient.OBFUSCATED_CACHE;
-        if (!obfuscatedCache.containsKey(sender.getId()) || !obfuscatedCache.get(sender.getId())) return params;
+        if (!obfuscatedCache.contains(sender.getId())) return params;
         MutableText modified = params.name().copy();
         modified = modified.formatted(Formatting.OBFUSCATED);
         HoverEvent originalHover = modified.getStyle().getHoverEvent();

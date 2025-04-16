@@ -20,8 +20,6 @@ import net.shirojr.illusionable.IllusionableClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Optional;
-
 @Mixin(PlayerListHud.class)
 public class PlayerListHudMixin {
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/PlayerSkinDrawer;draw(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/util/Identifier;IIIZZ)V"))
@@ -36,8 +34,8 @@ public class PlayerListHudMixin {
             original.call(context, texture, x, y, size, hatVisible, upsideDown);
             return;
         }
-        Optional<Boolean> isObfuscated = Optional.ofNullable(IllusionableClient.OBFUSCATED_CACHE.get(playerProfile.getId()));
-        if (isObfuscated.isEmpty() || !isObfuscated.get()) {
+        boolean isObfuscated = IllusionableClient.OBFUSCATED_CACHE.contains(playerProfile.getId());
+        if (!isObfuscated) {
             original.call(context, texture, x, y, size, hatVisible, upsideDown);
             return;
         }
@@ -53,8 +51,8 @@ public class PlayerListHudMixin {
         if (client.player.hasPermissionLevel(2) && client.getEntityRenderDispatcher().shouldRenderHitboxes()) {
             return original.call(instance, entry);
         }
-        Optional<Boolean> isObfuscated = Optional.ofNullable(IllusionableClient.OBFUSCATED_CACHE.get(entry.getProfile().getId()));
-        if (isObfuscated.isEmpty() || !isObfuscated.get()) {
+        boolean isObfuscated = IllusionableClient.OBFUSCATED_CACHE.contains(entry.getProfile().getId());
+        if (!isObfuscated) {
             return original.call(instance, entry);
         }
         MutableText name = original.call(instance, entry).copy();
