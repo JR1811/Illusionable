@@ -5,7 +5,7 @@ import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.shirojr.illusionable.util.wrapper.IllusionHandler;
+import net.shirojr.illusionable.cca.component.IllusionComponent;
 import org.jetbrains.annotations.Nullable;
 
 public class IllusionVoiceChat {
@@ -17,13 +17,14 @@ public class IllusionVoiceChat {
         if (voicechatServerApi == null) return;
         if (event.getSenderConnection() == null) return;
         if (!(event.getSenderConnection().getPlayer().getPlayer() instanceof ServerPlayerEntity player)) return;
-        if (!(player instanceof IllusionHandler illusion) || !illusion.illusionable$isIllusion()) return;
+        IllusionComponent illusionComponent = IllusionComponent.fromEntity(player);
+        if (!illusionComponent.isIllusion()) return;
 
         event.cancel();
 
         for (ServerPlayerEntity targetPlayer : PlayerLookup.tracking(player)) {
             if (player.getUuid().equals(targetPlayer.getUuid())) continue;
-            if (!illusion.illusionable$getIllusionTargets().contains(targetPlayer)) continue;
+            if (!illusionComponent.getTargets().contains(targetPlayer.getUuid())) continue;
             VoicechatConnection illusionConnection = voicechatServerApi.getConnectionOf(player.getUuid());
             VoicechatConnection targetConnection = voicechatServerApi.getConnectionOf(targetPlayer.getUuid());
             if (targetConnection == null || illusionConnection == null) continue;

@@ -26,6 +26,12 @@
 		],
 		"voicechat": [
 			"net.shirojr.illusionable.IllusionableVoicechatPlugin"
+		],
+		"cardinal-components-entity": [
+			"net.shirojr.illusionable.cca.IllusionableComponents"
+		],
+		"cardinal-components-scoreboard": [
+			"net.shirojr.illusionable.cca.IllusionableComponents"
 		]
 	},
 	"mixins": [
@@ -33,11 +39,20 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.10",
-		"minecraft": "~1.21.1",
-		"java": ">=21",
-		"fabric-api": "*"
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*",
+		"cardinal-components-base": "^5.2.3",
+		"cardinal-components-entity": "^5.2.3",
+		"cardinal-components-scoreboard": "^5.2.3"
 	},
 	"suggests": {
 		"voicechat": "*"
+	},
+	"custom": {
+		"cardinal-components": [
+			"illusionable:illusion",
+			"illusionable:obfuscation"
+		]
 	}
 }

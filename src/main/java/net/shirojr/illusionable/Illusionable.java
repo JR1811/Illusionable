@@ -15,8 +15,6 @@ public class Illusionable implements ModInitializer {
         IllusionableItems.initialize();
         IllusionableItemGroups.initialize();
         IllusionableStatusEffects.initialize();
-        IllusionableTrackedData.initialize();
-        IllusionableNetworkPayloads.initialize();
         IllusionableEvents.initializeCommon();
         LOGGER.info("I was crazy once...");
     }

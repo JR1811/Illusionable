@@ -16,7 +16,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.shirojr.illusionable.Illusionable;
-import net.shirojr.illusionable.IllusionableClient;
+import net.shirojr.illusionable.cca.component.ObfuscationComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -26,7 +26,7 @@ public class PlayerListHudMixin {
     private void renderObfuscatedSkin(DrawContext context, Identifier texture, int x, int y, int size, boolean hatVisible,
                                       boolean upsideDown, Operation<Void> original, @Local GameProfile playerProfile) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.player.isSpectator()) {
+        if (client.player == null || client.world == null || client.player.isSpectator()) {
             original.call(context, texture, x, y, size, hatVisible, upsideDown);
             return;
         }
@@ -34,7 +34,7 @@ public class PlayerListHudMixin {
             original.call(context, texture, x, y, size, hatVisible, upsideDown);
             return;
         }
-        boolean isObfuscated = IllusionableClient.OBFUSCATED_CACHE.contains(playerProfile.getId());
+        boolean isObfuscated = ObfuscationComponent.fromProvider(client.world.getScoreboard()).isObfuscated(playerProfile.getId());
         if (!isObfuscated) {
             original.call(context, texture, x, y, size, hatVisible, upsideDown);
             return;
@@ -45,13 +45,13 @@ public class PlayerListHudMixin {
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/PlayerListHud;getPlayerName(Lnet/minecraft/client/network/PlayerListEntry;)Lnet/minecraft/text/Text;"))
     private Text renderObfuscatedName(PlayerListHud instance, PlayerListEntry entry, Operation<Text> original) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.player.isSpectator()) {
+        if (client.player == null || client.world == null || client.player.isSpectator()) {
             return original.call(instance, entry);
         }
         if (client.player.hasPermissionLevel(2) && client.getEntityRenderDispatcher().shouldRenderHitboxes()) {
             return original.call(instance, entry);
         }
-        boolean isObfuscated = IllusionableClient.OBFUSCATED_CACHE.contains(entry.getProfile().getId());
+        boolean isObfuscated = ObfuscationComponent.fromProvider(client.world.getScoreboard()).isObfuscated(entry.getProfile().getId());
         if (!isObfuscated) {
             return original.call(instance, entry);
         }

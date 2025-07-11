@@ -12,7 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.shirojr.illusionable.IllusionableClient;
+import net.shirojr.illusionable.cca.component.ObfuscationComponent;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,10 +30,10 @@ public class EntityRendererMixin {
                                       Matrix4f matrix, VertexConsumerProvider vertexConsumers, TextRenderer.TextLayerType layerType,
                                       int backgroundColor, int light, Operation<Integer> original, @Local(argsOnly = true) Entity entity) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null || client.player == null) {
+        if (client == null || client.player == null || client.world == null) {
             return original.call(instance, text, x, y, color, shadow, matrix, vertexConsumers, layerType, backgroundColor, light);
         }
-        boolean isObfuscated = IllusionableClient.OBFUSCATED_CACHE.contains(entity.getUuid());
+        boolean isObfuscated = ObfuscationComponent.fromProvider(client.world.getScoreboard()).isObfuscated(entity.getUuid());
         MutableText newText = text.copy();
         if (isObfuscated) {
             if (!client.player.hasPermissionLevel(2) || !dispatcher.shouldRenderHitboxes()) {

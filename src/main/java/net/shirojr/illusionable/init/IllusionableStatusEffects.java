@@ -5,14 +5,12 @@ import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.ColorHelper;
 import net.shirojr.illusionable.Illusionable;
 import net.shirojr.illusionable.effect.ObfuscatedStatusEffect;
 
 public interface IllusionableStatusEffects {
     RegistryEntry<StatusEffect> OBFUSCATED = register("obfuscated", new ObfuscatedStatusEffect(
-            StatusEffectCategory.BENEFICIAL,
-            ColorHelper.Argb.fromFloats(1f, 0.8f, 0.8f, 0.8f))
+            StatusEffectCategory.BENEFICIAL, 0xbdbdbd)
     );
 
     @SuppressWarnings("SameParameterValue")

@@ -9,13 +9,16 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import net.shirojr.illusionable.util.wrapper.IllusionHandler;
+import net.shirojr.illusionable.Illusionable;
+import net.shirojr.illusionable.cca.component.IllusionComponent;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import static net.minecraft.server.command.CommandManager.argument;
@@ -30,6 +33,7 @@ public class IllusionCommand {
             new SimpleCommandExceptionType(Text.literal("No entries in victims list were applicable"));
 
 
+    @SuppressWarnings("unused")
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess dedicated, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(literal("illusion").requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(2))
                 .then(literal("set")
@@ -51,10 +55,16 @@ public class IllusionCommand {
     private static int setIllusionSate(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         List<Entity> illusions = new ArrayList<>(EntityArgumentType.getEntities(context, ILLUSION_KEY));
         boolean isIllusion = BoolArgumentType.getBool(context, ILLUSION_STATE_KEY);
-        for (Entity illusion : illusions) {
-            if (!(illusion instanceof IllusionHandler illusionRendering)) throw NOT_ILLUSIONABLE.create();
-            illusionRendering.illusionable$setIllusion(isIllusion);
-            if (!isIllusion) illusionRendering.illusionable$clearIllusionTargets();
+        for (Entity entry : illusions) {
+            if (!(entry instanceof LivingEntity illusion)) {
+                Illusionable.LOGGER.error("{} was not illusionable", entry, NOT_ILLUSIONABLE.create());
+                continue;
+            }
+            IllusionComponent illusionComponent = IllusionComponent.fromEntity(illusion);
+            illusionComponent.setIllusionState(isIllusion, true);
+            if (!isIllusion) {
+                illusionComponent.modifyTargets(HashSet::clear, true);
+            }
         }
         return Command.SINGLE_SUCCESS;
     }
@@ -64,9 +74,13 @@ public class IllusionCommand {
         List<Entity> victims = new ArrayList<>(EntityArgumentType.getEntities(context, VICTIMS_KEY));
         if (victims.isEmpty()) throw NO_VICTIMS_AVAILABLE.create();
 
-        for (Entity illusion : illusions) {
-            if (!(illusion instanceof IllusionHandler illusionRendering)) throw NOT_ILLUSIONABLE.create();
-            illusionRendering.illusionable$modifyIllusionTargets(uuids -> uuids.addAll(victims.stream().map(Entity::getUuid).toList()));
+        for (Entity entry : illusions) {
+            if (!(entry instanceof LivingEntity illusion)) {
+                Illusionable.LOGGER.error("{} was not illusionable", entry, NOT_ILLUSIONABLE.create());
+                continue;
+            }
+            IllusionComponent illusionComponent = IllusionComponent.fromEntity(illusion);
+            illusionComponent.modifyTargets(uuids -> uuids.addAll(victims.stream().map(Entity::getUuid).toList()), true);
 
             StringBuilder sb = new StringBuilder("Added");
             victims.forEach(entity -> sb.append(" ").append(entity.getName().getString()));
@@ -78,9 +92,13 @@ public class IllusionCommand {
 
     private static int clearAllIllusionTargets(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         Collection<? extends Entity> illusions = EntityArgumentType.getEntities(context, ILLUSION_KEY);
-        for (Entity illusion : illusions) {
-            if (!(illusion instanceof IllusionHandler illusionRendering)) throw NOT_ILLUSIONABLE.create();
-            illusionRendering.illusionable$clearIllusionTargets();
+        for (Entity entry : illusions) {
+            if (!(entry instanceof LivingEntity illusion)) {
+                Illusionable.LOGGER.error("{} was not illusionable", entry, NOT_ILLUSIONABLE.create());
+                continue;
+            }
+            IllusionComponent illusionComponent = IllusionComponent.fromEntity(illusion);
+            illusionComponent.modifyTargets(HashSet::clear, true);
         }
         return Command.SINGLE_SUCCESS;
     }
@@ -88,9 +106,13 @@ public class IllusionCommand {
     private static int clearIllusionTargets(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         Collection<? extends Entity> illusions = EntityArgumentType.getEntities(context, ILLUSION_KEY);
         Collection<? extends Entity> victims = EntityArgumentType.getEntities(context, VICTIMS_KEY);
-        for (Entity illusion : illusions) {
-            if (!(illusion instanceof IllusionHandler illusionRendering)) throw NOT_ILLUSIONABLE.create();
-            illusionRendering.illusionable$modifyIllusionTargets(uuids -> uuids.removeAll(victims.stream().map(Entity::getUuid).toList()));
+        for (Entity entry : illusions) {
+            if (!(entry instanceof LivingEntity illusion)) {
+                Illusionable.LOGGER.error("{} was not illusionable", entry, NOT_ILLUSIONABLE.create());
+                continue;
+            }
+            IllusionComponent illusionComponent = IllusionComponent.fromEntity(illusion);
+            illusionComponent.modifyTargets(uuids -> victims.stream().map(Entity::getUuid).toList().forEach(uuids::remove), true);
         }
         return Command.SINGLE_SUCCESS;
     }

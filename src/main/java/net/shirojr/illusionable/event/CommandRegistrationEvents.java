@@ -5,8 +5,6 @@ import net.shirojr.illusionable.command.IllusionCommand;
 
 public class CommandRegistrationEvents {
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
-            IllusionCommand.register(commandDispatcher, commandRegistryAccess, registrationEnvironment);
-        });
+        CommandRegistrationCallback.EVENT.register(IllusionCommand::register);
     }
 }

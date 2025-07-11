@@ -37,13 +37,13 @@ public class ObfuscatedDebugItem extends Item {
     public static boolean toggleObfuscation(World world, PlayerEntity user, LivingEntity target, ItemStack stack) {
         if (user.getItemCooldownManager().isCoolingDown(stack.getItem())) return false;
         if (world instanceof ServerWorld serverWorld) {
-            if (!target.hasStatusEffect(IllusionableStatusEffects.OBFUSCATED)) {
-                target.removeStatusEffect(IllusionableStatusEffects.OBFUSCATED);
-                target.addStatusEffect(new StatusEffectInstance(IllusionableStatusEffects.OBFUSCATED, 20 * 60 * 5));
+            if (!target.hasStatusEffect(IllusionableStatusEffects.OBFUSCATED.value())) {
+                target.removeStatusEffect(IllusionableStatusEffects.OBFUSCATED.value());
+                target.addStatusEffect(new StatusEffectInstance(IllusionableStatusEffects.OBFUSCATED.value(), 20 * 60 * 5));
                 serverWorld.playSound(null, user.getBlockPos(), SoundEvents.ENTITY_LEASH_KNOT_PLACE, SoundCategory.PLAYERS, 2f, 1f);
                 user.getItemCooldownManager().set(stack.getItem(), 100);
             } else {
-                target.removeStatusEffect(IllusionableStatusEffects.OBFUSCATED);
+                target.removeStatusEffect(IllusionableStatusEffects.OBFUSCATED.value());
                 serverWorld.playSound(null, user.getBlockPos(), SoundEvents.ENTITY_LEASH_KNOT_BREAK, SoundCategory.PLAYERS, 2f, 1f);
                 user.getItemCooldownManager().set(stack.getItem(), 100);
             }

@@ -10,7 +10,7 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.shirojr.illusionable.IllusionableClient;
+import net.shirojr.illusionable.cca.component.ObfuscationComponent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,21 +26,21 @@ public class MessageHandlerMixin {
 
     @ModifyVariable(method = "onChatMessage", at = @At("HEAD"), argsOnly = true)
     private MessageType.Parameters obfuscatePlayerName(MessageType.Parameters params, @Local(argsOnly = true) GameProfile sender) {
-        if (client == null || client.player == null) return params;
-        var obfuscatedCache = IllusionableClient.OBFUSCATED_CACHE;
-        if (!obfuscatedCache.contains(sender.getId())) return params;
+        if (client == null || client.player == null || client.world == null) return params;
+        ObfuscationComponent obfuscationComponent = ObfuscationComponent.fromProvider(client.world.getScoreboard());
+        if (obfuscationComponent.isObfuscated(sender.getId())) return params;
         MutableText modified = params.name().copy();
         modified = modified.formatted(Formatting.OBFUSCATED);
         HoverEvent originalHover = modified.getStyle().getHoverEvent();
         ClickEvent originalClick = modified.getStyle().getClickEvent();
         if (originalHover != null) {
             var entityInformation = originalHover.getValue(HoverEvent.Action.SHOW_ENTITY);
-            if (entityInformation != null && entityInformation.name.isPresent()) {
+            if (entityInformation != null && entityInformation.name != null) {
                 Text obfuscation;
                 if (client.player.hasPermissionLevel(2) || client.player.isSpectator()) {
-                    obfuscation = entityInformation.name.get().copy().append(Text.translatable("chat.illusionable.hint.obfuscation", " - [", " ]"));
+                    obfuscation = entityInformation.name.copy().append(Text.translatable("chat.illusionable.hint.obfuscation", " - [", " ]"));
                 } else {
-                    obfuscation = entityInformation.name.get().copy().formatted(Formatting.OBFUSCATED);
+                    obfuscation = entityInformation.name.copy().formatted(Formatting.OBFUSCATED);
                     if (originalClick != null) {
                         modified.setStyle(modified.getStyle().withClickEvent(null));
                     }
