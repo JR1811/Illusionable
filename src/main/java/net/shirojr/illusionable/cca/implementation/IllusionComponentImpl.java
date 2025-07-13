@@ -69,7 +69,7 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
             targets.clear();
             NbtList illusionTargets = nbt.getList("illusionTargets", NbtElement.STRING_TYPE);
             for (NbtElement nbtElement : illusionTargets) {
-                targets.add(UUID.fromString(nbtElement.toString()));
+                targets.add(UUID.fromString(nbtElement.asString()));
             }
         }, false);
     }
@@ -78,8 +78,8 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
     public void writeToNbt(NbtCompound nbt) {
         nbt.putBoolean("isIllusion", this.isIllusion);
         NbtList targetListNbt = new NbtList();
-        for (UUID entry : this.targets) {
-            targetListNbt.add(NbtString.of(entry.toString()));
+        for (UUID uuidEntry : this.targets) {
+            targetListNbt.add(NbtString.of(uuidEntry.toString()));
         }
         nbt.put("illusionTargets", targetListNbt);
     }

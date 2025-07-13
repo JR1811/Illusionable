@@ -28,7 +28,7 @@ public class MessageHandlerMixin {
     private MessageType.Parameters obfuscatePlayerName(MessageType.Parameters params, @Local(argsOnly = true) GameProfile sender) {
         if (client == null || client.player == null || client.world == null) return params;
         ObfuscationComponent obfuscationComponent = ObfuscationComponent.fromProvider(client.world.getScoreboard());
-        if (obfuscationComponent.isObfuscated(sender.getId())) return params;
+        if (!obfuscationComponent.isObfuscated(sender.getId())) return params;
         MutableText modified = params.name().copy();
         modified = modified.formatted(Formatting.OBFUSCATED);
         HoverEvent originalHover = modified.getStyle().getHoverEvent();
