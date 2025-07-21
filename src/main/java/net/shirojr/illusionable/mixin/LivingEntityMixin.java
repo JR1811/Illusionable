@@ -2,13 +2,18 @@ package net.shirojr.illusionable.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import net.minecraft.entity.Attackable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
+import net.shirojr.illusionable.cca.component.DamageDistributionComponent;
 import net.shirojr.illusionable.cca.component.IllusionComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,5 +54,18 @@ public abstract class LivingEntityMixin extends Entity implements Attackable {
             return;
         }
         clearPotionSwirls();
+    }
+
+    @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
+    private void distributeDamageToLinked(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LocalFloatRef amountArg) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        if (!(this.getWorld() instanceof ServerWorld serverWorld)) return;
+        DamageDistributionComponent damageComponent = DamageDistributionComponent.fromEntity(entity);
+        float leftOverDamage = damageComponent.distributeDamage(serverWorld, source, amount);
+        if (leftOverDamage <= 0) {
+            cir.setReturnValue(true);
+        } else {
+            amountArg.set(leftOverDamage);
+        }
     }
 }
