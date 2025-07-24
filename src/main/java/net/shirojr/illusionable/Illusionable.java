@@ -16,6 +16,7 @@ public class Illusionable implements ModInitializer {
         IllusionableItemGroups.initialize();
         IllusionableStatusEffects.initialize();
         IllusionableDamageTypes.initialize();
+        IllusionableParticleTypes.initialize();
         IllusionableGameRules.initialize();
         IllusionableEvents.initializeCommon();
         LOGGER.info("I was crazy once...");
