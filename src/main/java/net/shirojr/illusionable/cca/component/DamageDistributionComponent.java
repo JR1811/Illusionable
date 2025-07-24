@@ -41,6 +41,10 @@ public interface DamageDistributionComponent extends Component, ServerTickingCom
 
     void setAggressor(@Nullable UUID aggressor, boolean shouldSync);
 
+    float getAppliedDamageMultiplier();
+
+    void setAppliedDamageMultiplier(float multiplier);
+
     /**
      * Distributes damage to all linked entities
      *

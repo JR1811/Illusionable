@@ -26,6 +26,7 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
     private final Deque<UUID> linkedTargets;
     private long duration;
     private double range;
+    private float multiplier;
 
     @Nullable
     private UUID aggressor;
@@ -37,6 +38,7 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
         this.duration = 0;
 
         this.aggressor = null;
+        this.multiplier = 0.8f;
     }
 
     @Override
@@ -101,6 +103,16 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
     }
 
     @Override
+    public float getAppliedDamageMultiplier() {
+        return multiplier;
+    }
+
+    @Override
+    public void setAppliedDamageMultiplier(float multiplier) {
+        this.multiplier = multiplier;
+    }
+
+    @Override
     public float distributeDamage(ServerWorld world, DamageSource damageSource, float incomingDamage) {
         float damageLeft = incomingDamage;
         if (isEmpty() || damageSource.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
@@ -121,7 +133,8 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
                 continue;
             }
             float damage = Math.min(damageLeft, livingEntity.getHealth());
-            boolean wasDamaged = livingEntity.damage(IllusionableDamageTypes.of(world, IllusionableDamageTypes.LINKED_DAMAGE.get()), damage);
+            boolean wasDamaged = livingEntity.damage(IllusionableDamageTypes.of(world, IllusionableDamageTypes.LINKED_DAMAGE.get()),
+                    damage * getAppliedDamageMultiplier());
             if (!wasDamaged) continue;
             livingEntity.playSound(SoundEvents.ENTITY_ALLAY_DEATH, 1.0f, 0.8f);
             damageLeft = Math.max(0, damageLeft - damage);
