@@ -12,14 +12,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.shirojr.illusionable.Illusionable;
 import net.shirojr.illusionable.cca.component.IllusionComponent;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -84,7 +83,7 @@ public class IllusionCommand {
 
             StringBuilder sb = new StringBuilder("Added");
             victims.forEach(entity -> sb.append(" ").append(entity.getName().getString()));
-            context.getSource().sendFeedback(() -> Text.literal(sb.toString()), false);
+            context.getSource().sendFeedback(() -> Text.literal(sb.toString()), true);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -92,12 +91,26 @@ public class IllusionCommand {
 
     private static int clearAllIllusionTargets(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         Collection<? extends Entity> illusions = EntityArgumentType.getEntities(context, ILLUSION_KEY);
+        context.getSource().sendFeedback(() -> Text.literal("Cleared Illusion Targets").formatted(Formatting.GOLD), true);
+        ServerWorld world = context.getSource().getWorld();
+
         for (Entity entry : illusions) {
             if (!(entry instanceof LivingEntity illusion)) {
                 Illusionable.LOGGER.error("{} was not illusionable", entry, NOT_ILLUSIONABLE.create());
                 continue;
             }
             IllusionComponent illusionComponent = IllusionComponent.fromEntity(illusion);
+
+            context.getSource().sendFeedback(() -> Text.literal("For %s:".formatted(entry.getName().getString())), true);
+            StringBuilder sb = new StringBuilder();
+            for (UUID targetUuid : illusionComponent.getTargets()) {
+                Entity target = world.getEntity(targetUuid);
+                if (target == null) continue;
+                String targetName = target.getName().getString();
+                sb.append(targetName).append(" ");
+            }
+            context.getSource().sendFeedback(() -> Text.literal(sb.toString()), true);
+
             illusionComponent.modifyTargets(HashSet::clear, true);
         }
         return Command.SINGLE_SUCCESS;
@@ -106,11 +119,17 @@ public class IllusionCommand {
     private static int clearIllusionTargets(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         Collection<? extends Entity> illusions = EntityArgumentType.getEntities(context, ILLUSION_KEY);
         Collection<? extends Entity> victims = EntityArgumentType.getEntities(context, VICTIMS_KEY);
+        context.getSource().sendFeedback(() -> Text.literal("Cleared Illusion Targets").formatted(Formatting.GOLD), true);
         for (Entity entry : illusions) {
             if (!(entry instanceof LivingEntity illusion)) {
                 Illusionable.LOGGER.error("{} was not illusionable", entry, NOT_ILLUSIONABLE.create());
                 continue;
             }
+            context.getSource().sendFeedback(() -> Text.literal("For %s:".formatted(entry.getName().getString())), true);
+            StringBuilder sb = new StringBuilder();
+            victims.forEach(entity -> sb.append(entity.getName().getString()).append(" "));
+            context.getSource().sendFeedback(() -> Text.literal(sb.toString()), true);
+
             IllusionComponent illusionComponent = IllusionComponent.fromEntity(illusion);
             illusionComponent.modifyTargets(uuids -> victims.stream().map(Entity::getUuid).toList().forEach(uuids::remove), true);
         }
