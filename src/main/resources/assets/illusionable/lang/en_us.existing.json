@@ -1,7 +1,4 @@
 {
-  "itemgroup.illusionable.illusionable": "Illusionable (Debug)",
-  "item.illusionable.illusion_debug": "Illusion Debug",
-  "item.illusionable.obfuscated_debug": "Obfuscated Debug",
   "effect.illusionable.obfuscated": "Obfuscated",
   "chat.illusionable.hint.obfuscation": "%s OBFUSCATED %s",
   "gamerule.infiniteDamageChain": "Continues Damage Chain Infinitely",

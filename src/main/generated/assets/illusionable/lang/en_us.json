@@ -1,0 +1,11 @@
+{
+  "chat.illusionable.hint.obfuscation": "%s OBFUSCATED %s",
+  "death.attack.linked_damage": "Somebody made %s feel their pain",
+  "death.attack.linked_damage.item": "%s experienced the sorrows of %s using %s",
+  "death.attack.linked_damage.player": "%s felt the burden of %s",
+  "effect.illusionable.obfuscated": "Obfuscated",
+  "gamerule.infiniteDamageChain": "Continues Damage Chain Infinitely",
+  "item.illusionable.illusion_debug": "Illusion Debug",
+  "item.illusionable.obfuscated_debug": "Obfuscated Debug",
+  "itemgroup.illusionable.illusionable": "Illusionable"
+}

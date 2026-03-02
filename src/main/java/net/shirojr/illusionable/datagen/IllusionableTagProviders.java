@@ -37,7 +37,19 @@ public class IllusionableTagProviders {
         }
     }
 
+    public static class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
+        public ItemTagProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
+            super(output, completableFuture);
+        }
+
+        @Override
+        protected void configure(RegistryWrapper.WrapperLookup arg) {
+
+        }
+    }
+
     public static void addAllProviders(FabricDataGenerator.Pack pack) {
         pack.addProvider(DamageTypeTagProvider::new);
+        pack.addProvider(ItemTagProvider::new);
     }
 }

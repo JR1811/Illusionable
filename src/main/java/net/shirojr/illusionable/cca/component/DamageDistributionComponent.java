@@ -1,7 +1,7 @@
 package net.shirojr.illusionable.cca.component;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.world.ServerWorld;
@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public interface DamageDistributionComponent extends Component, ServerTickingComponent {
+public interface DamageDistributionComponent extends Component, CommonTickingComponent {
     Identifier KEY = Illusionable.getId("damage_distribution");
 
     static DamageDistributionComponent fromEntity(LivingEntity entity) {

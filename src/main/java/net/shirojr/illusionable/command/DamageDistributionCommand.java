@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -22,14 +23,14 @@ import java.util.List;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class DamageDistributionCommand {
+public class DamageDistributionCommand implements CommandRegistrationCallback {
     private static final SimpleCommandExceptionType NOT_DAMAGEABLE =
             new SimpleCommandExceptionType(Text.literal("Entity can't receive damage"));
     private static final SimpleCommandExceptionType INVALID_DURATION =
             new SimpleCommandExceptionType(Text.literal("Invalid Duration. Either positive or -1 for infinite duration"));
 
-    @SuppressWarnings("unused")
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
+    @Override
+    public void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         dispatcher.register(literal("damage").requires(source -> source.hasPermissionLevel(2))
                 .then(literal("distribution")
                         .then(argument("user", EntityArgumentType.entity())
@@ -65,4 +66,6 @@ public class DamageDistributionCommand {
         damageDistributionComponent.start(targets, duration, range);
         return Command.SINGLE_SUCCESS;
     }
+
+
 }

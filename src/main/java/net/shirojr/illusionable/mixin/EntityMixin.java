@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -31,14 +30,6 @@ public abstract class EntityMixin {
     private void avoidStepSound(Entity instance, SoundEvent sound, float volume, float pitch, Operation<Void> original) {
         if (!isIllusion(instance)) {
             original.call(instance, sound, volume, pitch);
-        }
-    }
-
-    @Inject(method = "isSilent", at = @At("HEAD"), cancellable = true)
-    private void avoidIllusionSound(CallbackInfoReturnable<Boolean> cir) {
-        Entity entity = (Entity) (Object) this;
-        if (isIllusion(entity)) {
-            cir.setReturnValue(true);
         }
     }
 

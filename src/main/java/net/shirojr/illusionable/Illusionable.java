@@ -3,6 +3,7 @@ package net.shirojr.illusionable;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import net.shirojr.illusionable.init.*;
+import net.shirojr.illusionable.network.IllusionableC2SNetworking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,9 @@ public class Illusionable implements ModInitializer {
         IllusionableStatusEffects.initialize();
         IllusionableDamageTypes.initialize();
         IllusionableGameRules.initialize();
-        IllusionableEvents.initializeCommon();
+        IllusionableCommonEvents.initializeCommon();
+        IllusionableC2SNetworking.initialize();
+
         LOGGER.info("I was crazy once...");
     }
 

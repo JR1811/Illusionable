@@ -42,13 +42,13 @@ dependencies {
 	implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
 
 	// CCA
-	include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
-	include "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
-	include "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cca_version}"
+	modApi ("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}")
+	modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
+	modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cca_version}"
 
 	// vosk
-	implementation group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
-	implementation group: 'com.alphacephei', name: 'vosk', version: '0.3.45'
+	//implementation group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
+	//implementation group: 'com.alphacephei', name: 'vosk', version: '0.3.45'
 }
 
 processResources {

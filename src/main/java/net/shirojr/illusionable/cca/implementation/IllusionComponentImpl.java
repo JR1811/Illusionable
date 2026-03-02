@@ -19,26 +19,31 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
     private final LivingEntity entity;
     private boolean isIllusion;
     private final HashSet<UUID> targets;
+    private IconRendering iconRendering;
 
     public IllusionComponentImpl(LivingEntity entity) {
         this.entity = entity;
         this.isIllusion = false;
         this.targets = new HashSet<>();
+        this.iconRendering = new IconRendering(true, 0.25, 30);
     }
 
     @Override
     public LivingEntity getEntity() {
-        return entity;
+        return this.entity;
     }
 
     @Override
     public boolean isIllusion() {
-        return isIllusion;
+        return this.isIllusion;
     }
 
     @Override
     public void setIllusionState(boolean isIllusion, boolean sync) {
         this.isIllusion = isIllusion;
+        if (!this.entity.getWorld().isClient()) {
+            this.entity.setSilent(isIllusion);
+        }
         if (sync) {
             IllusionableComponents.ILLUSION_DATA.sync(this.entity);
         }
@@ -57,14 +62,25 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
         }
     }
 
-    @SuppressWarnings("unused")
+    @Override
     public boolean isTarget(LivingEntity other) {
         return this.targets.contains(other.getUuid());
+    }
+
+    public IconRendering modifyIconRendering(Consumer<IconRendering> iconRendering, boolean shouldSync) {
+        iconRendering.accept(this.iconRendering);
+        if (shouldSync) this.sync();
+        return this.iconRendering;
+    }
+
+    public IconRendering getIconRendering() {
+        return iconRendering;
     }
 
     @Override
     public void readFromNbt(NbtCompound nbt) {
         setIllusionState(nbt.getBoolean("isIllusion"), false);
+
         modifyTargets(targets -> {
             targets.clear();
             NbtList illusionTargets = nbt.getList("illusionTargets", NbtElement.STRING_TYPE);
@@ -72,6 +88,9 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
                 targets.add(UUID.fromString(nbtElement.asString()));
             }
         }, false);
+
+        IconRendering iconRendering = IconRendering.fromNbt(nbt);
+        if (iconRendering != null) this.iconRendering = iconRendering;
     }
 
     @Override
@@ -82,5 +101,7 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
             targetListNbt.add(NbtString.of(uuidEntry.toString()));
         }
         nbt.put("illusionTargets", targetListNbt);
+
+        this.iconRendering.toNbt(nbt);
     }
 }

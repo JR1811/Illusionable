@@ -43,7 +43,7 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
 
     @Override
     public Set<UUID> getLinkedTargets() {
-        return Set.copyOf(linkedTargets);
+        return Set.copyOf(this.linkedTargets);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
 
     @Override
     public double getRange() {
-        return range;
+        return this.range;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
     @Override
     @Nullable
     public UUID getAggressor() {
-        return aggressor;
+        return this.aggressor;
     }
 
     @Override
@@ -209,18 +209,18 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
     }
 
     @Override
-    public void serverTick() {
-        if (!(provider.getWorld() instanceof ServerWorld world) || isEmpty()) return;
+    public void tick() {
+        if (!(provider.getWorld() instanceof ServerWorld world) || this.isEmpty()) return;
         HashSet<UUID> toBeRemoved = new HashSet<>();
         if (getDuration() == 0) {
             toBeRemoved.addAll(getLinkedTargets());
         } else {
-            for (UUID linkedEntityUuid : getLinkedTargets()) {
+            for (UUID linkedEntityUuid : this.getLinkedTargets()) {
                 if (!(world.getEntity(linkedEntityUuid) instanceof LivingEntity target)) {
                     toBeRemoved.add(linkedEntityUuid);
                     continue;
                 }
-                if (provider.squaredDistanceTo(target) > range * range) {
+                if (this.provider.squaredDistanceTo(target) > this.range * this.range) {
                     toBeRemoved.add(linkedEntityUuid);
                 }
             }

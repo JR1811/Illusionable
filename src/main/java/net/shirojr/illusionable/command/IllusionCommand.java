@@ -3,15 +3,18 @@ package net.shirojr.illusionable.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -23,17 +26,20 @@ import java.util.*;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class IllusionCommand {
+public class IllusionCommand implements CommandRegistrationCallback {
     public static final String ILLUSION_KEY = "illusion", ILLUSION_STATE_KEY = "illusionState", VICTIMS_KEY = "victims";
+    public static final String ICONS_VISIBLE_KEY = "IconsVisible", ICONS_SCALE = "IconsScale", ICONS_RADIUS = "IconsRadius";
 
     private static final SimpleCommandExceptionType NOT_ILLUSIONABLE =
-            new SimpleCommandExceptionType(Text.literal("Entity can't be an illusion"));
+            new SimpleCommandExceptionType(Text.literal("Not Illusionable"));
     private static final SimpleCommandExceptionType NO_VICTIMS_AVAILABLE =
             new SimpleCommandExceptionType(Text.literal("No entries in victims list were applicable"));
+    private static final SimpleCommandExceptionType DATA_NOT_SET =
+            new SimpleCommandExceptionType(Text.literal("Data couldn't be applied"));
 
 
-    @SuppressWarnings("unused")
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess dedicated, CommandManager.RegistrationEnvironment environment) {
+    @Override
+    public void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         dispatcher.register(literal("illusion").requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(2))
                 .then(literal("set")
                         .then(argument(ILLUSION_KEY, EntityArgumentType.entities())
@@ -47,9 +53,63 @@ public class IllusionCommand {
                         .then(argument(ILLUSION_KEY, EntityArgumentType.entities())
                                 .executes(IllusionCommand::clearAllIllusionTargets)
                                 .then(argument(VICTIMS_KEY, EntityArgumentType.entities())
-                                        .executes(IllusionCommand::clearIllusionTargets)))));
+                                        .executes(IllusionCommand::clearIllusionTargets))))
+                .then(literal("icons")
+                        .then(literal("visible")
+                                .then(argument(ICONS_VISIBLE_KEY, BoolArgumentType.bool())
+                                        .executes(IllusionCommand::showIcons)
+                                )
+                        )
+                        .then(literal("scale")
+                                .then(argument(ICONS_SCALE, DoubleArgumentType.doubleArg(0.00001))
+                                        .executes(IllusionCommand::setIconsScale)
+                                )
+                        )
+                        .then(literal("radius")
+                                .then(argument(ICONS_RADIUS, DoubleArgumentType.doubleArg(0.00001))
+                                        .executes(IllusionCommand::setIconsRadius)
+                                )
+                        )
+                )
+        );
     }
 
+    private static int setIconsRadius(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        double radius = DoubleArgumentType.getDouble(context, ICONS_RADIUS);
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        if (player == null) throw NOT_ILLUSIONABLE.create();
+        IllusionComponent component = IllusionComponent.fromEntity(player);
+        if (!component.getIconRendering().setRadius(radius)) {
+            throw DATA_NOT_SET.create();
+        }
+        component.sync();
+        context.getSource().sendFeedback(() -> Text.literal("Set Icons Radius: " + radius), false);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int setIconsScale(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        double scale = DoubleArgumentType.getDouble(context, ICONS_SCALE);
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        if (player == null) throw NOT_ILLUSIONABLE.create();
+        IllusionComponent component = IllusionComponent.fromEntity(player);
+        if (!component.getIconRendering().setScale(scale)) {
+            throw DATA_NOT_SET.create();
+        }
+        component.sync();
+        context.getSource().sendFeedback(() -> Text.literal("Set Icons Scale: " + scale), false);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int showIcons(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        boolean visible = BoolArgumentType.getBool(context, ICONS_VISIBLE_KEY);
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        if (player == null) throw NOT_ILLUSIONABLE.create();
+        IllusionComponent component = IllusionComponent.fromEntity(player);
+        component.getIconRendering().setShowIcon(visible);
+        component.sync();
+        context.getSource().sendFeedback(() -> Text.literal("Show icons: " + visible), false);
+        return Command.SINGLE_SUCCESS;
+    }
 
     private static int setIllusionSate(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         List<Entity> illusions = new ArrayList<>(EntityArgumentType.getEntities(context, ILLUSION_KEY));
