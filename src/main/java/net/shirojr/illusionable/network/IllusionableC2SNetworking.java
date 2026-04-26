@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class IllusionableC2SNetworking {
     static {
-        ServerPlayNetworking.registerGlobalReceiver(NetworkIdentifiers.PLACE_BLOCK_DEBUG, (minecraftServer, serverPlayerEntity, serverPlayNetworkHandler, packetByteBuf, packetSender) -> IllusionableC2SNetworking.onBlockPlaceDebug(minecraftServer, serverPlayerEntity, serverPlayNetworkHandler, packetByteBuf, packetSender));
+        ServerPlayNetworking.registerGlobalReceiver(NetworkIdentifiers.PLACE_BLOCK_DEBUG, IllusionableC2SNetworking::onBlockPlaceDebug);
     }
 
     private static void onBlockPlaceDebug(MinecraftServer server, ServerPlayerEntity player,

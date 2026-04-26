@@ -44,16 +44,24 @@ public class IllusionCommand implements CommandRegistrationCallback {
                 .then(literal("set")
                         .then(argument(ILLUSION_KEY, EntityArgumentType.entities())
                                 .then(argument(ILLUSION_STATE_KEY, BoolArgumentType.bool())
-                                        .executes(IllusionCommand::setIllusionSate))))
+                                        .executes(IllusionCommand::setIllusionSate)))
+                )
                 .then(literal("add")
                         .then(argument(ILLUSION_KEY, EntityArgumentType.entities())
                                 .then(argument(VICTIMS_KEY, EntityArgumentType.entities())
-                                        .executes(IllusionCommand::addIllusionTargets))))
+                                        .executes(IllusionCommand::addIllusionTargets)))
+                )
                 .then(literal("remove")
                         .then(argument(ILLUSION_KEY, EntityArgumentType.entities())
                                 .executes(IllusionCommand::clearAllIllusionTargets)
                                 .then(argument(VICTIMS_KEY, EntityArgumentType.entities())
-                                        .executes(IllusionCommand::clearIllusionTargets))))
+                                        .executes(IllusionCommand::clearIllusionTargets)))
+                )
+                .then(literal("info")
+                        .then(argument("target", EntityArgumentType.entity())
+                                .executes(IllusionCommand::getIllusionInfo)
+                        )
+                )
                 .then(literal("icons")
                         .then(literal("visible")
                                 .then(argument(ICONS_VISIBLE_KEY, BoolArgumentType.bool())
@@ -72,6 +80,27 @@ public class IllusionCommand implements CommandRegistrationCallback {
                         )
                 )
         );
+    }
+
+    private static int getIllusionInfo(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        Entity illusion = EntityArgumentType.getEntity(context, "target");
+        if (!(illusion instanceof LivingEntity livingEntity)) {
+            throw NOT_ILLUSIONABLE.create();
+        }
+        IllusionComponent component = IllusionComponent.fromEntity(livingEntity);
+        ServerWorld world = context.getSource().getWorld();
+        StringBuilder output = new StringBuilder("Current Targets for ").append(illusion.getName().getString()).append(": ");
+        for (UUID targetUuid : component.getTargets()) {
+            Entity entity = world.getEntity(targetUuid);
+            output.append(", ");
+            if (entity == null) {
+                output.append(targetUuid);
+            } else {
+                output.append(entity.getName().getString());
+            }
+        }
+        context.getSource().sendFeedback(() -> Text.literal(output.toString()), true);
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int setIconsRadius(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {

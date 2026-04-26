@@ -63,7 +63,7 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
     }
 
     @Override
-    public boolean isTarget(LivingEntity other) {
+    public boolean isTargeting(LivingEntity other) {
         return this.targets.contains(other.getUuid());
     }
 

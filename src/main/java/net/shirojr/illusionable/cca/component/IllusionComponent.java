@@ -22,13 +22,13 @@ public interface IllusionComponent extends Component {
 
     LivingEntity getEntity();
 
-    boolean isIllusion();
+    boolean isIllusion();   //TODO: reverse, grab other entity on assigned and add it to their list
 
     void setIllusionState(boolean isIllusion, boolean sync);
 
     Set<UUID> getTargets();
 
-    boolean isTarget(LivingEntity other);
+    boolean isTargeting(LivingEntity other);
 
     void modifyTargets(Consumer<HashSet<UUID>> consumer, boolean sync);
 

@@ -38,7 +38,7 @@ public class IllusionableRenderEvents implements WorldRenderEvents.AfterEntities
                 other -> !other.equals(player) && player.squaredDistanceTo(other) <= radius * radius);
 
         for (LivingEntity target : targetsInRange) {
-            boolean isVisible = selfComponent.isTarget(target);
+            boolean isVisible = selfComponent.isTargeting(target);
             double scale = selfComponent.getIconRendering().getScale();
             this.renderIllusionEyeOnTarget(context, player, target, isVisible, scale);
         }

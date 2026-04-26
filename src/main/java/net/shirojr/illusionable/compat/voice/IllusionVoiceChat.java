@@ -24,7 +24,7 @@ public class IllusionVoiceChat {
 
         for (ServerPlayerEntity targetPlayer : PlayerLookup.tracking(player)) {
             if (player.getUuid().equals(targetPlayer.getUuid())) continue;
-            if (!illusionComponent.isTarget(targetPlayer)) continue;
+            if (!illusionComponent.isTargeting(targetPlayer)) continue;
             VoicechatConnection illusionConnection = voicechatServerApi.getConnectionOf(player.getUuid());
             VoicechatConnection targetConnection = voicechatServerApi.getConnectionOf(targetPlayer.getUuid());
             if (targetConnection == null || illusionConnection == null) continue;
