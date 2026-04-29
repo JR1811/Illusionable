@@ -58,7 +58,7 @@ public class IllusionCommand implements CommandRegistrationCallback {
                                         .executes(IllusionCommand::clearIllusionTargets)))
                 )
                 .then(literal("info")
-                        .then(argument("target", EntityArgumentType.entity())
+                        .then(argument("holder", EntityArgumentType.entity())
                                 .executes(IllusionCommand::getIllusionInfo)
                         )
                 )
@@ -83,7 +83,7 @@ public class IllusionCommand implements CommandRegistrationCallback {
     }
 
     private static int getIllusionInfo(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        Entity illusion = EntityArgumentType.getEntity(context, "target");
+        Entity illusion = EntityArgumentType.getEntity(context, "holder");
         if (!(illusion instanceof LivingEntity livingEntity)) {
             throw NOT_ILLUSIONABLE.create();
         }

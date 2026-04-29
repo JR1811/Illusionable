@@ -15,6 +15,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import net.shirojr.illusionable.cca.component.DamageDistributionComponent;
 import net.shirojr.illusionable.cca.component.IllusionComponent;
+import net.shirojr.illusionable.cca.util.IllusionStateCallback;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,9 +23,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity implements Attackable {
+public abstract class LivingEntityMixin extends Entity implements Attackable, IllusionStateCallback {
     @Shadow
     protected abstract void clearPotionSwirls();
+
+    @Shadow
+    protected abstract void markEffectsDirty();
 
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
@@ -67,5 +71,11 @@ public abstract class LivingEntityMixin extends Entity implements Attackable {
         } else {
             amountArg.set(leftOverDamage);
         }
+    }
+
+    @Override
+    public void illusionable$onIllusionStateChanged(IllusionComponent component, boolean isIllusion) {
+        IllusionStateCallback.super.illusionable$onIllusionStateChanged(component, isIllusion);
+        markEffectsDirty();
     }
 }

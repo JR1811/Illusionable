@@ -8,21 +8,21 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.shirojr.illusionable.cca.IllusionableComponents;
 import net.shirojr.illusionable.cca.component.IllusionComponent;
+import net.shirojr.illusionable.cca.util.IllusionStateCallback;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class IllusionComponentImpl implements IllusionComponent, AutoSyncedComponent {
     private final LivingEntity entity;
+    private final HashSet<IllusionStateCallback> listeners;
     private boolean isIllusion;
     private final HashSet<UUID> targets;
     private IconRendering iconRendering;
 
     public IllusionComponentImpl(LivingEntity entity) {
         this.entity = entity;
+        this.listeners = new HashSet<>();
         this.isIllusion = false;
         this.targets = new HashSet<>();
         this.iconRendering = new IconRendering(true, 0.25, 30);
@@ -31,6 +31,11 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
     @Override
     public LivingEntity getEntity() {
         return this.entity;
+    }
+
+    @Override
+    public Collection<IllusionStateCallback> getListeners() {
+        return this.listeners;
     }
 
     @Override
@@ -44,6 +49,7 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
         if (!this.entity.getWorld().isClient()) {
             this.entity.setSilent(isIllusion);
         }
+        this.listeners.forEach(callback -> callback.illusionable$onIllusionStateChanged(this, isIllusion));
         if (sync) {
             IllusionableComponents.ILLUSION_DATA.sync(this.entity);
         }
@@ -65,12 +71,6 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
     @Override
     public boolean isTargeting(LivingEntity other) {
         return this.targets.contains(other.getUuid());
-    }
-
-    public IconRendering modifyIconRendering(Consumer<IconRendering> iconRendering, boolean shouldSync) {
-        iconRendering.accept(this.iconRendering);
-        if (shouldSync) this.sync();
-        return this.iconRendering;
     }
 
     public IconRendering getIconRendering() {

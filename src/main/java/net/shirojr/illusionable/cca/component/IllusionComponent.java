@@ -6,8 +6,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.shirojr.illusionable.Illusionable;
 import net.shirojr.illusionable.cca.IllusionableComponents;
+import net.shirojr.illusionable.cca.util.IllusionStateCallback;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -21,6 +23,8 @@ public interface IllusionComponent extends Component {
     }
 
     LivingEntity getEntity();
+
+    Collection<IllusionStateCallback> getListeners();
 
     boolean isIllusion();   //TODO: reverse, grab other entity on assigned and add it to their list
 

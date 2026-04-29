@@ -118,7 +118,7 @@ public class DamageDistributionComponentImpl implements DamageDistributionCompon
         if (isEmpty() || damageSource.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return damageLeft;
         }
-        if (damageSource.isOf(IllusionableDamageTypes.LINKED_DAMAGE.get()) && !world.getGameRules().getBoolean(IllusionableGameRules.LINKED_DAMAGE_CHAIN)) {
+        if (damageSource.isOf(IllusionableDamageTypes.LINKED_DAMAGE.get()) && !IllusionableGameRules.LINKED_DAMAGE_CHAIN.get(world)) {
             return damageLeft;
         }
         Iterator<UUID> iterator = linkedTargets.iterator();
