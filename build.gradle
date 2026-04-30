@@ -24,6 +24,18 @@ repositories {
 			url = 'https://maven.ladysnake.org/releases'
 		}
 	}
+
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 fabricApi {
@@ -49,6 +61,9 @@ dependencies {
 	// vosk
 	//implementation group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
 	//implementation group: 'com.alphacephei', name: 'vosk', version: '0.3.45'
+
+	// Presence-Footsteps mod compat
+	modImplementation "maven.modrinth:presence-footsteps:${project.presence_footsteps_version}"
 }
 
 processResources {

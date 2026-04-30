@@ -22,6 +22,9 @@ Entities that cannot perceive an illusion will not experience the following:
 
 If the [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) mod is installed, only the designated targets will be able to hear an illusion entity speaking.
 
+This mod also includes an optional compatibility with the [Presence Footsteps mod](https://modrinth.com/mod/presence-footsteps/version/1.10.1+1.20.1)
+to keep the steps of Illusions silent (also supported in vanilla sound handling).
+
 #### How to work with Illusions
 
 - Create an Illusion: `/illusion set <illusionEntity> true`
