@@ -10,6 +10,7 @@ import net.minecraft.entity.LivingEntity;
 import net.shirojr.illusionable.cca.component.DamageDistributionComponent;
 import net.shirojr.illusionable.cca.component.IllusionComponent;
 import net.shirojr.illusionable.cca.component.ObfuscationComponent;
+import net.shirojr.illusionable.cca.implementation.CensoredComponent;
 import net.shirojr.illusionable.cca.implementation.DamageDistributionComponentImpl;
 import net.shirojr.illusionable.cca.implementation.IllusionComponentImpl;
 import net.shirojr.illusionable.cca.implementation.ObfuscationComponentImpl;
@@ -18,11 +19,13 @@ public class IllusionableComponents implements EntityComponentInitializer, Score
     public static final ComponentKey<IllusionComponent> ILLUSION_DATA = ComponentRegistry.getOrCreate(IllusionComponent.KEY, IllusionComponent.class);
     public static final ComponentKey<ObfuscationComponent> OBFUSCATION_DATA = ComponentRegistry.getOrCreate(ObfuscationComponent.KEY, ObfuscationComponent.class);
     public static final ComponentKey<DamageDistributionComponent> DAMAGE_DISTRIBUTION = ComponentRegistry.getOrCreate(DamageDistributionComponent.KEY, DamageDistributionComponent.class);
+    public static final ComponentKey<CensoredComponent> CENSOR = ComponentRegistry.getOrCreate(CensoredComponent.KEY, CensoredComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(LivingEntity.class, ILLUSION_DATA, IllusionComponentImpl::new);
         registry.registerFor(LivingEntity.class, DAMAGE_DISTRIBUTION, DamageDistributionComponentImpl::new);
+        registry.registerForPlayers(CENSOR, CensoredComponent::new, CensoredComponent::onRespawn);
     }
 
     @Override

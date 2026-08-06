@@ -24,5 +24,4 @@ public class ObfuscatedStatusEffect extends StatusEffect {
         ObfuscationComponent obfuscationComponent = ObfuscationComponent.fromEntity(entity);
         obfuscationComponent.setObfuscated(entity, false, true);
     }
-
 }

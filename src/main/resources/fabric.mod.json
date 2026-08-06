@@ -53,7 +53,8 @@
 		"cardinal-components": [
 			"illusionable:illusion",
 			"illusionable:obfuscation",
-			"illusionable:damage_distribution"
+			"illusionable:damage_distribution",
+			"illusionable:censored"
 		]
 	}
 }

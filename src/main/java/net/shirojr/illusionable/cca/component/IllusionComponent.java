@@ -7,6 +7,7 @@ import net.minecraft.util.Identifier;
 import net.shirojr.illusionable.Illusionable;
 import net.shirojr.illusionable.cca.IllusionableComponents;
 import net.shirojr.illusionable.cca.util.IllusionStateCallback;
+import net.shirojr.illusionable.util.constant.IllusionableNbtKeys;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -82,17 +83,17 @@ public interface IllusionComponent extends Component {
         }
 
         public void toNbt(NbtCompound nbt) {
-            nbt.putBoolean("IconsVisible", this.showIcons());
-            nbt.putDouble("IconsScale", this.getScale());
-            nbt.putDouble("IconsRadius", this.getRadius());
+            nbt.putBoolean(IllusionableNbtKeys.ICONS_VISIBLE, this.showIcons());
+            nbt.putDouble(IllusionableNbtKeys.ICON_SCALE, this.getScale());
+            nbt.putDouble(IllusionableNbtKeys.ICON_RADIUS, this.getRadius());
         }
 
         @Nullable
         public static IconRendering fromNbt(NbtCompound nbt) {
-            if (!nbt.contains("IconsVisible") || !nbt.contains("IconsScale") || !nbt.contains("IconsRadius")) {
+            if (!nbt.contains(IllusionableNbtKeys.ICONS_VISIBLE) || !nbt.contains(IllusionableNbtKeys.ICON_SCALE) || !nbt.contains(IllusionableNbtKeys.ICON_RADIUS)) {
                 return null;
             }
-            return new IconRendering(nbt.getBoolean("IconsVisible"), nbt.getDouble("IconsScale"), nbt.getDouble("IconsRadius"));
+            return new IconRendering(nbt.getBoolean(IllusionableNbtKeys.ICONS_VISIBLE), nbt.getDouble(IllusionableNbtKeys.ICON_SCALE), nbt.getDouble(IllusionableNbtKeys.ICON_RADIUS));
         }
     }
 }

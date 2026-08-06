@@ -8,5 +8,6 @@ public interface IllusionableClientEvents {
 
     static void initializeClient() {
         WorldRenderEvents.AFTER_ENTITIES.register(RENDER_EVENTS);
+        WorldRenderEvents.LAST.register(RENDER_EVENTS);
     }
 }

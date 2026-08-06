@@ -9,6 +9,7 @@ import net.minecraft.nbt.NbtString;
 import net.shirojr.illusionable.cca.IllusionableComponents;
 import net.shirojr.illusionable.cca.component.IllusionComponent;
 import net.shirojr.illusionable.cca.util.IllusionStateCallback;
+import net.shirojr.illusionable.util.constant.IllusionableNbtKeys;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -79,15 +80,18 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
 
     @Override
     public void readFromNbt(NbtCompound nbt) {
-        setIllusionState(nbt.getBoolean("isIllusion"), false);
-
-        modifyTargets(targets -> {
-            targets.clear();
-            NbtList illusionTargets = nbt.getList("illusionTargets", NbtElement.STRING_TYPE);
-            for (NbtElement nbtElement : illusionTargets) {
-                targets.add(UUID.fromString(nbtElement.asString()));
-            }
-        }, false);
+        if (nbt.contains(IllusionableNbtKeys.IS_ILLUSION)) {
+            setIllusionState(nbt.getBoolean(IllusionableNbtKeys.IS_ILLUSION), false);
+        }
+        if (nbt.contains(IllusionableNbtKeys.ILLUSION_TARGETS)) {
+            modifyTargets(targets -> {
+                targets.clear();
+                NbtList illusionTargets = nbt.getList(IllusionableNbtKeys.ILLUSION_TARGETS, NbtElement.STRING_TYPE);
+                for (NbtElement nbtElement : illusionTargets) {
+                    targets.add(UUID.fromString(nbtElement.asString()));
+                }
+            }, false);
+        }
 
         IconRendering iconRendering = IconRendering.fromNbt(nbt);
         if (iconRendering != null) this.iconRendering = iconRendering;
@@ -95,12 +99,12 @@ public class IllusionComponentImpl implements IllusionComponent, AutoSyncedCompo
 
     @Override
     public void writeToNbt(NbtCompound nbt) {
-        nbt.putBoolean("isIllusion", this.isIllusion);
+        nbt.putBoolean(IllusionableNbtKeys.IS_ILLUSION, this.isIllusion);
         NbtList targetListNbt = new NbtList();
         for (UUID uuidEntry : this.targets) {
             targetListNbt.add(NbtString.of(uuidEntry.toString()));
         }
-        nbt.put("illusionTargets", targetListNbt);
+        nbt.put(IllusionableNbtKeys.ILLUSION_TARGETS, targetListNbt);
 
         this.iconRendering.toNbt(nbt);
     }
