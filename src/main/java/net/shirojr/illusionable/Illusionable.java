@@ -20,6 +20,7 @@ public class Illusionable implements ModInitializer {
         IllusionableGameRules.initialize();
         IllusionableCommonEvents.initializeCommon();
         IllusionableC2SNetworking.initialize();
+        IllusionableArgumentTypes.initialize();
 
         LOGGER.info("I was crazy once...");
     }

@@ -10,22 +10,21 @@ import net.minecraft.entity.LivingEntity;
 import net.shirojr.illusionable.cca.component.DamageDistributionComponent;
 import net.shirojr.illusionable.cca.component.IllusionComponent;
 import net.shirojr.illusionable.cca.component.ObfuscationComponent;
-import net.shirojr.illusionable.cca.implementation.CensoredComponent;
-import net.shirojr.illusionable.cca.implementation.DamageDistributionComponentImpl;
-import net.shirojr.illusionable.cca.implementation.IllusionComponentImpl;
-import net.shirojr.illusionable.cca.implementation.ObfuscationComponentImpl;
+import net.shirojr.illusionable.cca.implementation.*;
 
 public class IllusionableComponents implements EntityComponentInitializer, ScoreboardComponentInitializer {
     public static final ComponentKey<IllusionComponent> ILLUSION_DATA = ComponentRegistry.getOrCreate(IllusionComponent.KEY, IllusionComponent.class);
     public static final ComponentKey<ObfuscationComponent> OBFUSCATION_DATA = ComponentRegistry.getOrCreate(ObfuscationComponent.KEY, ObfuscationComponent.class);
     public static final ComponentKey<DamageDistributionComponent> DAMAGE_DISTRIBUTION = ComponentRegistry.getOrCreate(DamageDistributionComponent.KEY, DamageDistributionComponent.class);
     public static final ComponentKey<CensoredComponent> CENSOR = ComponentRegistry.getOrCreate(CensoredComponent.KEY, CensoredComponent.class);
+    public static final ComponentKey<PlayerViewComponent> PLAYER_VIEW = ComponentRegistry.getOrCreate(PlayerViewComponent.KEY, PlayerViewComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(LivingEntity.class, ILLUSION_DATA, IllusionComponentImpl::new);
         registry.registerFor(LivingEntity.class, DAMAGE_DISTRIBUTION, DamageDistributionComponentImpl::new);
         registry.registerForPlayers(CENSOR, CensoredComponent::new, CensoredComponent::onRespawn);
+        registry.registerForPlayers(PLAYER_VIEW, PlayerViewComponent::new, PlayerViewComponent::onRespawn);
     }
 
     @Override

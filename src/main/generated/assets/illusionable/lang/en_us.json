@@ -1,5 +1,6 @@
 {
   "chat.illusionable.hint.obfuscation": "%s OBFUSCATED %s",
+  "chat.illusionable.hint.view_locked": "§4View is locked",
   "death.attack.linked_damage": "Somebody made %s feel their pain",
   "death.attack.linked_damage.item": "%s experienced the sorrows of %s using %s",
   "death.attack.linked_damage.player": "%s felt the burden of %s",

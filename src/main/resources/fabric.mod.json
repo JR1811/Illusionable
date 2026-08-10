@@ -54,7 +54,8 @@
 			"illusionable:illusion",
 			"illusionable:obfuscation",
 			"illusionable:damage_distribution",
-			"illusionable:censored"
+			"illusionable:censored",
+			"illusionable:player_view"
 		]
 	}
 }

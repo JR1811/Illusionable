@@ -7,4 +7,5 @@ public interface IllusionableNbtKeys {
     String ICONS_VISIBLE = "IconsVisible";
     String ICON_SCALE = "IconScale";
     String ICON_RADIUS = "IconRadius";
+    String VIEW_LOCKED = "ViewLocked";
 }

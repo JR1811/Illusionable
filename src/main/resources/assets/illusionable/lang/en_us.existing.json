@@ -1,6 +1,7 @@
 {
   "effect.illusionable.obfuscated": "Obfuscated",
   "chat.illusionable.hint.obfuscation": "%s OBFUSCATED %s",
+  "chat.illusionable.hint.view_locked": "§4View is locked",
   "gamerule.infiniteDamageChain": "Continues Damage Chain Infinitely",
   "death.attack.linked_damage": "Somebody made %s feel their pain",
   "death.attack.linked_damage.item": "%s experienced the sorrows of %s using %s",
