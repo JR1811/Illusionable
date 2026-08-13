@@ -5,16 +5,16 @@ import net.minecraft.command.argument.EnumArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.shirojr.illusionable.command.util.View;
 
-public class ViewArgumentType extends EnumArgumentType<View> {
-    private ViewArgumentType() {
+public class PerspectiveArgumentType extends EnumArgumentType<View> {
+    private PerspectiveArgumentType() {
         super(View.CODEC, View::values);
     }
 
-    public static EnumArgumentType<View> view() {
-        return new ViewArgumentType();
+    public static EnumArgumentType<View> perspective() {
+        return new PerspectiveArgumentType();
     }
 
-    public static View getView(CommandContext<ServerCommandSource> context, String id) {
+    public static View getPerspective(CommandContext<ServerCommandSource> context, String id) {
         return context.getArgument(id, View.class);
     }
 }

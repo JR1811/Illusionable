@@ -13,7 +13,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.shirojr.illusionable.cca.implementation.PlayerViewComponent;
-import net.shirojr.illusionable.command.argument.ViewArgumentType;
+import net.shirojr.illusionable.command.argument.PerspectiveArgumentType;
 import net.shirojr.illusionable.command.util.View;
 
 import java.util.Collection;
@@ -21,16 +21,16 @@ import java.util.Collection;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class PlayerViewCommand implements CommandRegistrationCallback {
+public class PlayerPerspectiveCommand implements CommandRegistrationCallback {
     @Override
     public void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
-        dispatcher.register(literal("view").requires(source -> source.hasPermissionLevel(2))
+        dispatcher.register(literal("perspective").requires(source -> source.hasPermissionLevel(2))
                 .then(literal("set")
-                        .then(literal("view")
-                                .then(argument("view", ViewArgumentType.view())
+                        .then(literal("perspective")
+                                .then(argument("perspective", PerspectiveArgumentType.perspective())
                                         .then(argument("lock", BoolArgumentType.bool())
                                                 .then(argument("targets", EntityArgumentType.players())
-                                                        .executes(PlayerViewCommand::setView)
+                                                        .executes(PlayerPerspectiveCommand::setView)
                                                 )
                                         )
                                 )
@@ -38,7 +38,7 @@ public class PlayerViewCommand implements CommandRegistrationCallback {
                         .then(literal("lock")
                                 .then(argument("lock", BoolArgumentType.bool())
                                         .then(argument("targets", EntityArgumentType.players())
-                                                .executes(PlayerViewCommand::setLock)
+                                                .executes(PlayerPerspectiveCommand::setLock)
                                         )
                                 )
                         )
@@ -55,7 +55,7 @@ public class PlayerViewCommand implements CommandRegistrationCallback {
     }
 
     private static int setView(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        View view = ViewArgumentType.getView(context, "view");
+        View view = PerspectiveArgumentType.getPerspective(context, "perspective");
         boolean lock = BoolArgumentType.getBool(context, "lock");
         Collection<ServerPlayerEntity> targets = EntityArgumentType.getPlayers(context, "targets");
         targets.forEach(target -> PlayerViewComponent.get(target).setView(view, true, lock));
